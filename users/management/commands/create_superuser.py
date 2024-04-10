@@ -5,7 +5,7 @@ from django.core.management import BaseCommand
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         """
-        Создания супер пользователя
+        Create superuser
         """
         user = User.objects.create(
             telegram_id='admin',

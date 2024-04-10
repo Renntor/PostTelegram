@@ -10,6 +10,9 @@ class User(AbstractUser):
     telegram_id = models.CharField(max_length=50, verbose_name='telegram_id')
     telegram_name = models.CharField(max_length=200, unique=True, verbose_name='telegram_name')
 
+    def __str__(self):
+        return self.telegram_name
+
     class Meta:
         verbose_name = 'user'
         verbose_name_plural = 'users'
