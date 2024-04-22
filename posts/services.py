@@ -1,5 +1,8 @@
 import os
 import django
+
+from posts.tasks import test
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 from django.conf import settings
 
@@ -47,7 +50,13 @@ def telegram_bot():
         elif call.data == 'btn_help':
             bot.send_message(call.message.chat.id, 'blah')
 
-    @bot.channel_post_handler(commands=['start'])
+    @bot.message_handler()
+    def error_send(message: types.Message):
+        if bool(User.objects.filter(telegram_id=message.from_user.id)) is False:
+            send_greeting()
+        bot.channel_post_handler(message.chat.id, 'Неизвестная команда!', reply_markup=kb)
+
+    @bot.channel_post_handler(commands=[])
     def post_channel(message: types.Message):
         if message.text == '/exit':
             bot.send_message(message.chat.id, 'Публикация поста отменена', reply_markup=kb)
@@ -56,13 +65,8 @@ def telegram_bot():
          post=message.text,
          owner=owner
         )
-        bot.send_message(os.getenv('CHANNEL'), f'{message.text}')
+        bot.send_message(os.getenv('CHANNEL'), f'{message}')
 
-    @bot.message_handler()
-    def error_send(message: types.Message):
-        if bool(User.objects.filter(telegram_id=message.from_user.id)) is False:
-            send_greeting()
-        bot.channel_post_handler(message.chat.id, 'Неизвестная команда!', reply_markup=kb)
 
     bot.polling()
 
