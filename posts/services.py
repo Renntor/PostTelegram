@@ -10,10 +10,9 @@ import telebot
 from dotenv import load_dotenv
 from telebot import types
 from users.models import User
-
+from posts.models import Post
 
 load_dotenv()
-
 
 
 def telegram_bot():
@@ -34,28 +33,40 @@ def telegram_bot():
                 telegram_id=user_id,
                 telegram_name=message.from_user.username
             )
-        bot.send_message(message.chat.id, f"""Добро пожаловать!\nЭтот бот предоставит вам
+            bot.send_message(message.chat.id, f"""Добро пожаловать!\nЭтот бот предоставит вам
 функционал для публикации постов в канал. Выберите функционал.""", reply_markup=kb)
+        else:
+            bot.send_message(message.chat.id, "Команды:", reply_markup=kb)
 
     @bot.callback_query_handler(func=lambda call: True)
     def reactions(call):
         if call.data == 'btn_post':
-            post_channel(call.message)
+            bot.send_message(call.message.chat.id, 'Напишите свой пост. Для отмены отправьте /exit')
+            bot.register_next_step_handler(call.message, post_channel)
 
         elif call.data == 'btn_help':
             bot.send_message(call.message.chat.id, 'blah')
 
-    @bot.channel_post_handler()
+    @bot.channel_post_handler(commands=['start'])
     def post_channel(message: types.Message):
-        bot.send_message(os.getenv('CHANNEL'), 'test')
+        if message.text == '/exit':
+            bot.send_message(message.chat.id, 'Публикация поста отменена', reply_markup=kb)
+        owner = User.objects.get(telegram_id=message.from_user.id)
+        Post.objects.create(
+         post=message.text,
+         owner=owner
+        )
+        bot.send_message(os.getenv('CHANNEL'), f'{message.text}')
 
-
-    # @bot.channel_post_handler(func=lambda call: True)
-    # def post_channel(call):
-    #     print(1)
-    #     bot.send_message(call.message.chat.id, 'test')
-
+    @bot.message_handler()
+    def error_send(message: types.Message):
+        if bool(User.objects.filter(telegram_id=message.from_user.id)) is False:
+            send_greeting()
+        bot.channel_post_handler(message.chat.id, 'Неизвестная команда!', reply_markup=kb)
 
     bot.polling()
 
-telegram_bot()
+
+
+if __name__ == '__main__':
+    telegram_bot()
