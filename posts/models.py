@@ -6,6 +6,7 @@ class Post(models.Model):
     """
     Model Post
     """
+    post_id = models.PositiveIntegerField(verbose_name='post id')
     post = models.CharField(max_length=500, verbose_name='post')
     count_like = models.IntegerField(verbose_name='count like', default=0)
 
@@ -22,7 +23,7 @@ class Post(models.Model):
 class Commentary(models.Model):
 
     comment = models.CharField(max_length=200, verbose_name='commentary')
-    post = models.ManyToManyField(Post)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.comment

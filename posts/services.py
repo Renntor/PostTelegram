@@ -1,7 +1,6 @@
 import os
 import django
 
-from posts.tasks import test
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 from django.conf import settings
@@ -62,14 +61,13 @@ def telegram_bot():
             bot.send_message(message.chat.id, 'Публикация поста отменена', reply_markup=kb)
         owner = User.objects.get(telegram_id=message.from_user.id)
         Post.objects.create(
+         post_id=message.id,
          post=message.text,
          owner=owner
         )
-        bot.send_message(os.getenv('CHANNEL'), f'{message}')
-
+        bot.send_message(os.getenv('CHANNEL'), f'{message.text}')
 
     bot.polling()
-
 
 
 if __name__ == '__main__':
