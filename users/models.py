@@ -10,6 +10,8 @@ class User(AbstractUser):
     telegram_id = models.CharField(max_length=50, verbose_name='telegram_id')
     telegram_name = models.CharField(max_length=200, unique=True, verbose_name='telegram_name')
 
+    password = models.CharField(max_length=200, **NULLABLE, verbose_name='password')
+
     def __str__(self):
         return self.telegram_name
 

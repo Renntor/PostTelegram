@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAdminUser
 from .serializer import UserSerializers
 
 
-class UserRetrieveDestroyAPIView(generics.RetrieveDestroyAPIView):
+class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     permission_classes = [IsAdminUser]
     serializer_class = UserSerializers
