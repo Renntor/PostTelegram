@@ -5,7 +5,7 @@ from users.models import User
 
 class UserTestCase(APITestCase):
 
-    def setUp(self) -> None:
+    def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create(
             id=500,
@@ -30,7 +30,7 @@ class UserTestCase(APITestCase):
     def test_create_user(self):
         response = self.client.post(
             '/users/',
-            {'id':501,
+            {'id': 501,
              "telegram_id": 'test_2',
              "telegram_name": 'test_2',
              }

@@ -6,4 +6,4 @@ class PostSerializers(ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('post_id', 'owner',)
+        fields = ('post_id', 'post', 'owner',)
